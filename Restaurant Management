@@ -1,0 +1,120 @@
+
+/**
+ *
+ * @author Rino
+ */
+import java.util.*;
+import java.io.*;
+
+class Mealsets
+{
+ private String name;
+ private int price, totalOrders;
+ public Vector<Mealsets> V;
+ public Mealsets(String na, int pr)                       	{name=na; price=pr;}
+ public int getprice()                                    	{return price;}
+}
+
+class Customers
+{
+private String name;
+private int seats,total=0;
+private int [] meals;
+public Customers(String na, int se, int[] mea)            	{name=na; seats=se; meals=mea;}
+public int totalBill()                                    	{return total;}
+public void calculateBill(Vector<Mealsets> V)             	{
+                                                          	for(int i=0; i<V.size(); i++){
+                                                              	total += V.get(i).getprice()*meals[i];
+                                                              	}
+                                                          	System.out.printf("\t%d",total);
+                                                          	}
+public int getSeats()                                     	{return seats;}
+public void servinprint ()                                	{System.out.printf("%s\ttakes\t %d seats\t",name,seats);}
+public void leavinprint ()                                	{System.out.printf("%s\tleaves\t %d seats\t",name,seats);}
+public void skipprint  ()                                 	{System.out.printf("skip \t%s\n",name);}
+}
+
+public class Restaurant {
+public static void main(String[] args) {
+
+ 	
+   	Vector <Mealsets> MS = new Vector <Mealsets> ();
+   	Vector <Customers> Waiting = new Vector <Customers> ();
+   	Vector <Customers> Dining = new Vector <Customers> ();
+   	int totalSeats = 10,leftseats = 10, totalMealsets = 0, customers = 0;
+ 	try
+ 	{
+     	Scanner ms = new Scanner (new File("mealsets.txt"));
+     	Scanner cu = new Scanner (new File("customers.txt"));
+     	for(int i=0;i<4;i++)
+     	{
+          	String[] buf = ms.nextLine().split(",");
+          	MS.add(new Mealsets(buf[0],Integer.parseInt(buf[1].trim())));
+          	totalMealsets++;
+     	}
+
+     	for (int i=0;i<10;i++)
+     	{
+         	int[] tempmeal= new int[4];
+         	String[]buf1 = cu.nextLine().split("\\s+");
+         	for(int j=2;j<buf1.length;j++){
+             	tempmeal[j-2] = Integer.parseInt(buf1[j]);
+         	}
+         	Waiting.add(new Customers(buf1[0],Integer.parseInt(buf1[1].trim()),tempmeal));
+        	customers++;
+     	}
+ 	}
+ 	catch (Exception e) {System.err.println(e);}
+  
+  	for(int clock=1;clock<=Waiting.size();clock++)
+  	{
+      	if(clock%5 != 0)
+      	{
+         	for(int a=0;a<Waiting.size();a++)
+         	{if(Waiting.get(clock-1+a).getSeats()<leftseats||Waiting.get(clock-1+a).getSeats()<leftseats)
+         	{
+            	System.out.printf("Clock %d\t\t",clock);
+            	leftseats=leftseats-Waiting.get(clock-1+a).getSeats();
+            	Waiting.get(clock-1+a).servinprint();
+            	System.out.printf("%d seats left\n",leftseats);
+            	Dining.add(Waiting.get(clock-1+a));
+            	Waiting.remove(clock-1+a);
+            	break;
+         	}
+         	else
+         	{
+         	System.out.printf("Clock %d\t\t",clock);
+         	Waiting.get(a).skipprint();
+         	}
+      	}
+      	}
+      	else
+      	{
+           	System.out.printf("Clock %d\t\t",clock);
+         	leftseats=leftseats+Waiting.get(clock-5).getSeats();
+         	Waiting.get(clock-5).leavinprint();
+         	System.out.printf("%d seats left",leftseats);
+         	System.out.printf("\tbill = ");
+         	Waiting.get(clock-5).calculateBill(MS);
+         	System.out.printf("\tBaht\n");
+         	for(int a=0;a<Waiting.size();a++)
+        { 
+        if(Waiting.get(clock-1+a).getSeats()<leftseats||Waiting.get(clock-1+a).getSeats()<leftseats)
+         	{
+          System.out.printf("Clock %d\t\t",clock);
+         	leftseats=leftseats-Waiting.get(clock-1+a).getSeats();
+         	Waiting.get(clock-+a).servinprint();
+         	System.out.printf("%d seats left\n",leftseats);
+         	Waiting.remove(a);
+         	break;
+         	}
+         	else
+         	{
+         	System.out.printf("Clock %d\t\t",clock);
+         	Waiting.get(a).skipprint();
+         	}
+      	}
+    	}
+  	}
+}
+}
