@@ -1,0 +1,73 @@
+import java.util.*;
+import java.io.*;
+
+class ShuffleThread extends Thread
+{
+private PrintWriter write;
+private Vector<Integer> SV;
+public ShuffleThread(String name, Vector<Integer> V) 
+{ 
+super(name);
+SV = new Vector<Integer>();
+for (int i=0; i < V.size(); i++) SV.add( V.get(i) );
+}
+public void run()
+{
+int count=0;
+try
+{
+write = new PrintWriter( new File(this.getName() + ".txt")); 
+
+boolean check=false; 
+while(check==false){
+for(int i=0;i<SV.size()-1;i++)
+if(SV.get(i)<=SV.get(i+1))
+{
+check=true;
+}
+else
+{
+check=false;
+
+write.println(count + ">" + SV);
+Collections.shuffle(SV); 
+count++;
+
+break;
+}
+}write.close();
+
+
+}
+catch(Exception e){System.err.println(e);}
+System.out.printf("%s > shuffles  %d\n",this.getName(),count);
+}
+
+}
+
+public class NewMain {
+
+public static void main(String[] args) {
+
+Vector<Integer> V = new Vector<Integer>();
+System.out.println("Insert 5 Intengers:"); 
+System.out.printf("Main >");
+Scanner input = new Scanner(System.in);
+String buf =input.nextLine();
+input = new Scanner(buf);
+String [] puck= input.nextLine().split("\\s+");
+for(int i=0;i<5;i++)
+{
+V.add(Integer.parseInt(puck[i]));
+}
+
+ShuffleThread T1=new ShuffleThread("T1",V);
+ShuffleThread T2=new ShuffleThread("T2",V);
+
+T1.start();
+T2.start(); 
+
+}
+
+}
+
