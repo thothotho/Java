@@ -1,0 +1,274 @@
+import java.util.*;
+import java.io.*;
+
+class Pancake implements Comparable
+{
+private int ID;
+private int diameter;
+public int getID() {return ID;}
+public int getdiameter() {return diameter;}
+public void setID(int newid) {ID=newid;}
+public void setdiameter(int newdia) {diameter=newdia;}
+public Pancake(int id, int dia) {ID=id; diameter=dia;}
+
+public int compareTo(Object other) 
+{
+       	Pancake temp=(Pancake)other;
+       	if(this.diameter>=temp.diameter)
+       	return 1;return 0;
+}
+}
+class PancakeStack extends Vector<Pancake>
+{
+    
+ public void printer ()
+ {
+     int gid, gdia, space; //variable related to printing process
+     for(int k=this.size()-1; k>=0;k--)
+        {
+        //Get ID and Dia from pancake
+        gid = this.get(k).getID();
+        gdia = this.get(k).getdiameter();
+        System.out.printf("\nPancake ID %2d, size = %2d  	",gid,gdia);
+        space=(20-gdia)/2;
+        for(int n=0; n<space;n++) {System.out.printf(" ");}
+        for(int m=0; m<gdia;m++) {System.out.printf("=");}
+
+                }
+     {System.out.printf("\n");}
+ }
+ public void switcher(Pancake p1, Pancake p2) {  //this method is for swapping each pancake only, 
+     //only objected need to swap are passed to here
+     int tempid=0;
+     int tempdia=0;
+     tempid=p1.getID();
+     tempdia=p1.getdiameter();
+     p1.setID(p2.getID());
+     p1.setdiameter(p2.getdiameter());
+     p2.setID(tempid);
+     p2.setdiameter(tempdia);
+     
+ }
+ 
+ public void flip(int flipatid) {  //this method is for finding the right location to insert spatula
+     //
+     int idfoundat=this.size()-1; //index location
+     int runner=this.size()-1; //runner index from top of vector to bottom
+              
+    while (flipatid!=this.get(idfoundat).getID()) //Loop looking for index
+    {
+        idfoundat--;
+    };
+    
+   for (;runner>((idfoundat/2));) //Loop sending 
+    {
+        //System.out.printf("p.size is %d, runner is %d, idfoundat is %d\n", p.size(), runner, idfoundat); //For debugging
+        //The cases where pancakestack size is odd and even is subjected to different pattern of issues, these conditioning dealing with all indiscriminately
+        if ((idfoundat==this.size())) break; //faulty point workaround: 1) sometimes the run up value (idfoundat) may runs exceeding vector size
+        if ((idfoundat==this.size()-1)&&(runner%2==1)) break; //2) there maybe mistake where the last flip repeated with the first ab->ba->ab
+        if ((idfoundat==runner)) break; //3) stop before process mirrors
+        this.switcher(this.get(runner),this.get(idfoundat));
+        runner--;
+        idfoundat++;
+        if (runner+1!=idfoundat) {continue;} //4) this general check indicates when the loop is supposed to end, works with most cases but fails occasionally, thus 1)-3) conditions are needed
+        else break;
+    }
+ }
+ 
+ public int isSorted() { //Stack is assumed sorted by default, 
+     //except a pancake is bigger than another one on the bottom is found, invalid indication will be send
+ int invalid=1;
+ for (int i=0;i<this.size()-1;i++)
+ {invalid = this.get(i).compareTo(this.get(i+1));
+     if (invalid == 0) break;
+ }
+return invalid;
+ }
+}
+
+public class PancakeMain {
+	public static void main(String[] args) {
+	Vector<Pancake> PancakeStack = new Vector<Pancake>( );
+	int size=0, dia, id; //Initially defined variables, Size of stack, size of each pancake, pancake ID
+        int count=1,flipatid,grandcheck=0,select; //Menu Interface related variables
+        int check=0; //counting times that Pancakes are flipped
+	PancakeStack p =  new PancakeStack();
+	Pancake a;
+	Scanner input = new Scanner(System.in);
+        ////////////////////Main page/////////////////////
+        System.out.printf("Welcome to Pancake sorting program\n");
+        while (grandcheck==0){
+        
+        System.out.printf("To start in manual mode,   input '1'\n");
+        System.out.printf("To start in autosort mode, input '2'\n");
+        System.out.printf("To access credit page,     input '3'\n");
+        System.out.printf("To exit the program,       input '4'\n");
+        System.out.printf("Input: ");
+        select=input.nextInt();
+       
+        if (select==1){
+            do {
+            System.out.printf("Number of Pancake = ");
+            size=input.nextInt();
+            if (size>10||size<=1) {System.out.printf("the size of stack must be more than 1 and no more than 11\n");}
+            } while (size>10||size<=1);
+            for(int i=0; i<size;i++)
+            {
+            id=i+1;
+            do {
+            System.out.printf("Input diameter of pancake %d = ",id);
+            dia=input.nextInt();
+            if (dia>20 || dia<=0 || dia%2==1)
+            {
+                    System.out.printf("Diameter size should be more than 0 or less than 21 and even number\n");
+                    System.out.printf("Please input again \n");
+            }
+            } while (dia>20 || dia<=0 || dia%2==1);
+            a = new Pancake(id,dia);
+            p.add(a);
+            }
+            do{
+            ///////////Check if Sorted///////////
+            check=p.isSorted();
+            ////////////print process/////////////
+            p.printer();
+            /////////Ask and Flip process////////
+            if (check!=1){
+                do{
+                System.out.printf("\n(%d) Insert spactula at pancake ",count);
+                count++;
+                flipatid=input.nextInt();
+                if(flipatid<p.size()+1)
+                {
+                    p.flip(flipatid);
+                }
+                else {System.out.printf("That ID does not exist, try again!\n");}
+                } while(flipatid>p.size());
+
+            }
+
+            if (check == 1) {System.out.printf("\n\nCongratulation, Your pancakes are sorted in %d flips\n\n",count-1);
+            // IsSort? if sort will return check = 1 if sorted
+            count=1;
+            p.clear();
+            
+            }
+            System.out.printf("\n");
+            }while (check==0);
+        }
+        //end of mode 1 (manual)
+        ///////////////////////////////////////////////////////////
+        
+        
+        else if (select==2){ //Much of the code is reused
+            System.out.printf("Welcome to Automatic Sorting mode!\n");
+            do {
+            System.out.printf("Number of Pancake = ");
+            size=input.nextInt();
+            if (size>10||size<=1) {System.out.printf("the size of stack must be more than 1 and no more than 11\n");}
+            } while (size>10||size<=1);
+            for(int i=0; i<size;i++)
+            {
+            id=i+1;
+            do {
+            System.out.printf("Input diameter of pancake %d = ",id);
+            dia=input.nextInt();
+            if (dia>20 || dia<=0 || dia%2==1)
+            {
+                    System.out.printf("Diameter size should be more than 0 or less than 21 and even number\n");
+                    System.out.printf("Please input again \n");
+            }
+            } while (dia>20 || dia<=0 || dia%2==1);
+            a = new Pancake(id,dia);
+            p.add(a);
+            }
+            do{
+            ////////Check if Sorted and print///////////
+            check=p.isSorted();
+            p.printer();
+            try {
+                 Thread.sleep(3000);
+             } catch(InterruptedException ex) {Thread.currentThread().interrupt();}
+              
+            /////////////////////////////////////
+            
+              /////////////Find best and Flip process////////////////
+             int max=0, idofmax=0;
+             int sos=0; //scope of stack, limited focus area
+              
+              while (sos<p.size()-1)
+              {
+              ///////////////print processs////
+                
+                //////////////////////////////
+                max=0; idofmax=0; //value resets each time
+                
+                for(int i=sos;i<(p.size());i++)
+                {
+                    //values resets each time
+                    if (max<=p.get(i).getdiameter())
+                    {
+                        max=p.get(i).getdiameter(); 
+                        idofmax=p.get(i).getID();
+                        //System.out.printf("\nmax value now is %d belongs to ID %d",max,idofmax);msg. for debug
+                    }
+                  
+                }
+              System.out.printf("\nBottom of stack in scope's ID is %d, value is %d",p.get(sos).getID(),p.get(sos).getdiameter());
+              //there is no need to flip at all if a pancake is already on proper tempolary position
+              
+              if (max!=p.get(sos).getdiameter())
+              {
+                System.out.printf("\nMax value's ID is %d, value is %d",max,idofmax);
+                if (max==p.get(p.size()-1).getdiameter()) {System.out.printf("\nSince Max is already on top of the stack, no need to flip it up!");}
+                ///////////////FLIP UP PROCESS (OPTIONAL FOR THIS LOOP
+                else {
+                System.out.printf("\n\n(%d) Insert spactula at pancake %d\n",count,idofmax);
+                p.flip(idofmax);
+                count++; 
+                p.printer();
+                }
+                ////////////////FLIP DOWN PROCESS
+                System.out.printf("\n\n(%d) Flip down process begins, where bottom of the stack scope is ID %d\n",count,p.get(sos).getID());
+                p.flip(p.get(sos).getID());//get id at the bottom and flip
+                p.printer();
+            
+                count++;
+              }
+              else System.out.printf("\nLargest value is already on the right location of stack scope\nNo flips needed");
+              
+              sos++;
+              max=0; idofmax=0; //value resets each time
+              check=p.isSorted();
+              try {
+                 Thread.sleep(3000);
+                   } catch(InterruptedException ex) {Thread.currentThread().interrupt();}
+              }
+              
+
+            if (check == 1) {
+                System.out.printf("\n\nOur algorithm have pancakes sorted in %d flips\n\n",count-1);
+            // IsSort? if sort will return check = 1 if sorted
+            count=1;
+            p.clear();
+            
+            }
+            System.out.printf("\n");
+            }while (check==0);
+       
+        } //end of mode 2 Auto sort
+        else if (select==3){
+        System.out.printf("Credit: Group members\n");
+        System.out.printf("Chawit   Chiwarattanaphan 5481056\n");
+        System.out.printf("Masahiro Tokushima        5580379\n");
+        System.out.printf("Nataporn Tanopajaisit     5580671\n\n");
+        }
+        else if (select==4){grandcheck=1;}
+        
+        else System.out.printf("\nPlease input again!\n",count);
+         
+        }//end of grandcheck
+}
+}
+
+
