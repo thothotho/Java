@@ -1,2 +1,2 @@
 # Java
-This repository represents the work when I studied Paradigm Class in MUIC.
+This repository represents the work when I studied Java Class.
