@@ -18,6 +18,7 @@ b 2 0 1 0 1
 c 1 0 0 0 1
 d 4 0 2 2 0
 e 2 1 1 0 0
+
 -----------------
 
 The second text file name is 'Mealsets'.
@@ -28,6 +29,7 @@ Caesar Salad, 129
 Garlic Bread, 89
 French Fries, 79
 Sausages, 119
+
 -----------------
 
 After creating those files, finally you can run the program.
